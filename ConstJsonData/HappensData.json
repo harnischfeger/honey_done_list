@@ -1,0 +1,6 @@
+[
+    { "label": "Daily", "value": "Day" },
+    { "label": "Weekly", "value": "Week" },
+    { "label": "Monthly", "value": "Month" },
+    { "label": "Yearly", "value": "Year" }
+  ]

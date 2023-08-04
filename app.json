@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "honey_done_list",
+    "slug": "honey_done_list",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/iconHDL.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/HDLsplash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/iconHDL.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
