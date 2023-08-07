@@ -222,11 +222,11 @@ const NewsFeedItem = (props: ListProps) => {
                   text: 'Entire Series',
                   onPress: () =>  props.navigation.navigate('EditRecurringTask', {taskProps: taskProps}),
                 },
-                {text: 'This Task', onPress: () =>  props.navigation.navigate('EditTask', {id: props.id, comeFrom: props.cameFrom})},
+                {text: 'This Task', onPress: () =>  props.navigation.navigate('EditTask', {taskProps: taskProps})},
               ]);
         }
         else{
-        props.navigation.navigate('EditTask', {id: props.id, comeFrom: props.cameFrom});
+        props.navigation.navigate('EditTask', {taskProps: taskProps});
         }
     }
 

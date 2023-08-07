@@ -4,7 +4,7 @@ import Checkbox from 'expo-checkbox';
 import {colors} from "../components/colors"; 
 import {StyleSheet, View, Text, TextInput, Image, Switch, Pressable, Modal, KeyboardAvoidingView, Platform} from "react-native";
 import styled from "styled-components/native";
-import {Formik, FormikProps, useFormik} from "formik"; 
+import {Formik, FormikErrors, FormikProps, useFormik} from "formik"; 
 import * as Yup from 'yup'; 
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import clipboard from "../assets/clipboard.png"; 
@@ -46,7 +46,8 @@ startOn: string;
 endOn: string; 
 isEnabled: boolean; 
 isChecked: boolean; 
-days: string;
+days: string; 
+daysString: string; 
 }
 
 
@@ -171,7 +172,6 @@ const AddSchema = Yup.object().shape({
       then: () => Yup.string().required("Required"),
       otherwise: () => Yup.string().notRequired()
       }),
-   
 });
 
 const AddTask: FunctionComponent<NavProps> = (_props) => {
@@ -189,9 +189,8 @@ const AddTask: FunctionComponent<NavProps> = (_props) => {
   const [error, setError] = useState('');
   const initDate = new Date().toLocaleDateString("en-CA");
   //for recurring date rrule set
-  const [daysOfWeek] = useState(weekDays);
+  const [daysOfWeek, setDaysOfWeek] = useState(weekDays);
   const [isSelectedDay, setIsSelectedDay] = useState<number[]>([]); 
-  // const [recurringDates, setRecurringDates] = useState<string[]>([]); 
   //calendar values set for form
   const [selected, setSelected] = useState("");
   const [selectedStart, setSelectedStart] = useState(""); 
@@ -208,7 +207,6 @@ const rruleDates = async(values: { every: string; startOn: string; endOn: string
   var dateEnd= new Date(values.endOn + " " + time);
   if(values.isChecked == true){
     dateEnd.setFullYear(d.getFullYear() + 5); 
-    console.log(dateEnd);
   }
     const rule = new RRule({
       freq: RRule.WEEKLY,
@@ -225,7 +223,13 @@ const rruleDates = async(values: { every: string; startOn: string; endOn: string
 }
 
 const backArrowClick = () =>{
-
+  setIsSelectedDay([]); 
+  setIsRefresh(!isRefresh);
+  for (let w=0; w< weekDays.length; w++){
+    if(weekDays[w].isSelected == true){
+      weekDays[w].isSelected = false; 
+    }
+  }
   if(origin === "CalendarView"){
   _props.navigation.navigate('CalendarView', {refresh: isRefresh}); 
   }
@@ -234,12 +238,10 @@ const backArrowClick = () =>{
   }
 }
 const dropSubmit = () =>{
-console.log("G ot Here");
     db.transaction(tx => {
         tx.executeSql('DROP TABLE tasks; DELETE FROM SQLITE_SEQUENCE WHERE NAME = tasks',[],
 
         (tx, resultSet)=> {
-        console.log("Dropped"); 
         },
   
         (tx, error): boolean =>{
@@ -257,8 +259,9 @@ const toggleEnd = () => {
   setShowEnd(!showEnd); 
 };
 
-const dayOfWeekPress = (item: { id: number; title: string; isSelected: boolean; }) => {
+const dayOfWeekPress = (item: { id: number; title: string; isSelected: boolean; }, setValues: (values: React.SetStateAction<AddProps>, shouldValidate?: boolean | undefined) => void ) => {
 item.isSelected = !item.isSelected; 
+
   if(item.isSelected !== true){
     setIsSelectedDay((isSelectedDay) => isSelectedDay.filter((itemId) => itemId !== item.id)); 
   }else{
@@ -319,7 +322,8 @@ const markedEnd = useMemo(() => ({
   endOn:"",
   isEnabled: false,
   isChecked: false,
-  days: ""
+  days: "",
+  daysString:""
   };
 
   
@@ -338,6 +342,7 @@ const resetClick = () => {
    setSelected(""); 
    setSelectedStart(""); 
    setSelectedEnd(""); 
+   setDaysOfWeek(weekDays); 
  }
    return (   
 
@@ -349,6 +354,10 @@ const resetClick = () => {
           validateOnBlur={false}
           onSubmit={async (values, {resetForm})  => { 
             values.days = isSelectedDay.toString();
+            if(values.days === "" && values.isEnabled == true){
+              alert("Please select day(s) of the week.");
+              return; 
+            }
             if (values.isEnabled == true){ 
               try{
               const recurringDates = await rruleDates(values); 
@@ -373,8 +382,8 @@ const resetClick = () => {
                           resetForm();
                           setSelectedStart("");
                           setSelectedEnd("");  
-                       
-                      
+                          setIsSelectedDay([]); 
+                          setDaysOfWeek(weekDays);                     
                       },
                       (tx, error): boolean =>{
                           console.log("Error " + error); 
@@ -404,8 +413,6 @@ const resetClick = () => {
                       0
                     ],
                       (txObj, resultsSet) => {
-                          console.log("Results", resultsSet.insertId);
-                          console.log(resultsSet); 
                           resetForm(); 
                           setSelected(""); 
                           setIsRefresh(!isRefresh); 
@@ -422,10 +429,10 @@ const resetClick = () => {
                 console.error(error); 
               }
             }
+         
           }}
           >          
 {(props: FormikProps<AddProps>) => (
-  
   <BGContainer> 
     <SafeAreaView style={{flex: 1, backgroundColor:"transparent"}}>
       <StatusBar style="light"></StatusBar>
@@ -445,7 +452,7 @@ const resetClick = () => {
 {/* <Button title="add" onPress={() => anotherSubmit()}/> */}
     {/* <Button title="drop" onPress={() => dropSubmit()}/> */}
     <Pressable
-      onPress={() => dropSubmit()}> 
+      onPress={() => resetClick()}> 
         <Image source={reset} style={{ width:60, height:60}}/>
       </Pressable>
     <Pressable
@@ -569,7 +576,7 @@ const resetClick = () => {
    {daysOfWeek.map((item: {isSelected: boolean; title: string; id: number; }) =>{
     return(
       <TouchableOpacity  key={item.id}
-      onPress={()=>dayOfWeekPress(item)}>
+      onPress={()=>dayOfWeekPress(item, props.setValues)}>
         <WeekBackgroundRow style={{backgroundColor: item.isSelected == true ? colors.textColor : colors.inputBG}}>
           <WeekTitle>{item.title}</WeekTitle>
         </WeekBackgroundRow>

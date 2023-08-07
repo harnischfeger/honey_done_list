@@ -82,52 +82,37 @@ padding: 25px;
 const EditSchema = Yup.object().shape({
   title: Yup.string().required("Required"),
   type: Yup.string().required("Required"),
-
-
+  date: Yup.string().required("Required")
 });
 
 const EditTask: FunctionComponent<NavProps> = (_props) => {
   const [isRefresh, setIsRefresh] = useState(false);
-    let route: RouteProp<{params: {id: string, comeFrom:string}}, 'params'> = useRoute();
-    const task_id = route.params?.id; 
-    const origin = route.params?.comeFrom;
-    const navigation = useNavigation();
-    const [selected, setSelected] = useState("");
-    const [task, setTask] = useState({
-      id:"",
-      title:"",
-      type:"",
-      date:""
-    }); 
+  let route: RouteProp<{params: {taskProps: any}}, 'params'> = useRoute();
+  let taskProps = route.params?.taskProps;
+  let origin = route.params?.taskProps.comeFrom; 
+  const navigation = useNavigation();
+  const [selected, setSelected] = useState(taskProps.date);
   const [isFocus, setIsFocus] = useState(false);
   const [error, setError] = useState(''); 
-  const getTask = () =>{
-      db.transaction(tx => {
-          tx.executeSql("SELECT * from tasks where id=?" ,[task_id],
-            (tx, resultSet)=> {
-                setTask(resultSet.rows.item(0));
-            },
-            (tx, error): boolean =>{
-              console.log("error" + error); 
-              return false; 
-            }
-          )
-      }); 
-   
-  }
+  const task ={
+    id:taskProps.id,
+    title:taskProps.title,
+    type:taskProps.type, 
+    date:taskProps.date
+    };
 
   const cancelChange = () =>{
-    if(origin === "CalendarView"){
-    _props.navigation.navigate('CalendarView'); 
-    }
-    if (origin === "News"){
-      _props.navigation.navigate('LandingPage'); 
-    }
+    if( origin === "CalendarView"){
+      _props.navigation.navigate('CalendarView', {refresh: isRefresh}); 
+      }
+      if (origin === "News"){
+        _props.navigation.navigate('LandingPage', {refresh: isRefresh}); 
+      }
   }
   const deleteSelectedTask = () =>{
     try{
       db.transaction(tx => {
-        tx.executeSql('DELETE from tasks where id = ?',[task_id],
+        tx.executeSql('DELETE from tasks where id = ?',[taskProps.id],
     
         (tx, resultSet)=> {
           alert("Task has been successfully deleted!"); 
@@ -166,14 +151,6 @@ const EditTask: FunctionComponent<NavProps> = (_props) => {
     }
   }), [selected]);
 
-  useEffect(() => {
-    getTask(); 
-
-  }, []); 
-
-  useEffect(() => {
-    setSelected(task.date);
-  }, [task]); 
 
    return (   
  
@@ -193,8 +170,6 @@ const EditTask: FunctionComponent<NavProps> = (_props) => {
                     values.id
                   ],
                     (txObj, resultsSet) => {
-                        console.log("Results", resultsSet.rowsAffected);
-                        console.log(resultsSet); 
                         setIsRefresh(!isRefresh); 
                         if(origin === "CalendarView"){
                           alert("Task has been successfully Updated");

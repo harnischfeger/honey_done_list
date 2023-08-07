@@ -82,7 +82,6 @@ const CalendarView = (props:NavProps) => {
               (tx, resultSet)=> {
                 var rows:any = []; 
                 var newDaysObject = {}; 
-                console.log("CalendarView ResultLength " +resultSet.rows.length);
                   for (let i = 0; i <resultSet.rows.length; i++){      
                     var dayColor = colors.redBtn
                     rows.push(resultSet.rows.item(i));
@@ -117,7 +116,6 @@ const CalendarView = (props:NavProps) => {
 
     useEffect(() => { 
       getTasks(); 
-      console.log("params");
     }, [route.params?.refresh]); 
 
     function changeState(){

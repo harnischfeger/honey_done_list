@@ -145,6 +145,14 @@ textAlign: left;
 const AddSchema = Yup.object().shape({
     title: Yup.string().required("Required"),
     type: Yup.string().required("Required"),
+    happens: Yup.string().required("Required"),
+    every: Yup.string().required("Required"),
+    startOn: Yup.string().required("Required"),
+    endOn: Yup.string().when(['isChecked'], {
+      is: (isChecked: boolean) => isChecked == false,
+      then: () => Yup.string().required("Required"),
+      otherwise: () => Yup.string().notRequired()
+      }),
 });
 
 const EditRecurringTask: FunctionComponent<NavProps> = (_props) => {
@@ -219,18 +227,14 @@ const rruleDates = async(values: { every: string; startOn: string; endOn: string
 
 const getDays = () => {
   let taskDays = taskProps.days.split(",");
-  console.log("TaskDays " + taskProps.days);
   const newDays: Array<number> = []; 
   for (let t = 0; t< taskDays.length; t++){
     newDays.push(parseInt(taskDays[t])); 
     //dayOfWeekPress(daysOfWeek[newDays[t]]); 
     daysOfWeek[newDays[t]].isSelected = true; 
     setIsSelectedDay((isSelectedDay) => isSelectedDay.filter((itemId) => itemId !== newDays[t])); 
-    console.log(isSelectedDay); 
   }
   setIsSelectedDay(newDays); 
-  console.log("After loop " + newDays); 
-  console.log("After loop " + isSelectedDay); 
 }
 
 const deleteSubmit=()=>{
@@ -351,7 +355,6 @@ const insertLoop = async(values:any, recurringDates:any) => {
   let recurringIdRandom = Math.floor(Math.random() * 50000);
   if(recurringDates.length > 0){
     isloading = true; 
-    console.log("before for loop " + taskProps.days);
     for(let i=0; i < recurringDates.length; i++){
       db.transaction(tx=>{               
         tx.executeSql('INSERT INTO tasks (title, type, date, recurring, color, recurId, happens, every, days, iscompleted) values (?,?,?,?,?,?,?,?,?,?)', 
@@ -377,10 +380,8 @@ const insertLoop = async(values:any, recurringDates:any) => {
             }
             )
       });
-      console.log("in the loop"); 
     }  
     isloading = false;  
-    console.log("after loop " + isloading); 
     return isloading; 
   } 
 }
@@ -405,13 +406,13 @@ const insertLoop = async(values:any, recurringDates:any) => {
           validateOnChange={false}
           validateOnBlur={false}
           onSubmit={async (values)  => {  
-            console.log("Incoming selected day " + isSelectedDay.length )
+            if(isSelectedDay.length == 0){
+              alert("Please select day(s) of the week.");
+              return; 
+            }
             if (isSelectedDay.length > 0) {
               taskProps.days = isSelectedDay.toString();
-            console.log("Only if days changed " + taskProps.days )
           }
-            console.log("this is days " +taskProps.days); 
-            console.log("recurId " + taskProps.recurId);
             try{
               const recurringDates = await rruleDates(values);
               const isloading = await insertLoop(values, recurringDates);      
@@ -423,8 +424,6 @@ const insertLoop = async(values:any, recurringDates:any) => {
                 tx.executeSql('DELETE from tasks where recurId = ?',[taskProps.recurId],
             
                 (tx, resultSet)=> {
-                  console.log("Results " + resultSet.rowsAffected);
-                  console.log("in the finally " + isloading); 
                     setIsRefresh(!isRefresh); 
                   if(origin === "CalendarView"){
                     alert("Task has been successfully Updated");
