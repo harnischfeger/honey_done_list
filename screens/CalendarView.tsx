@@ -4,12 +4,13 @@ import styled from "styled-components/native";
 import { Container } from "../components/shared";
 import topBackground from "../assets/HDListlogo.png";  
 import NewsFeedItem from "../components/NewsFeedItem";
-import { StyleSheet,Image, View, Text, Modal, SafeAreaView, Button, Pressable, TouchableOpacity} from "react-native";
+import { StyleSheet,Image, View, Text, Modal, SafeAreaView, Button, Pressable, TouchableOpacity, ActivityIndicator} from "react-native";
 import * as SQLite from 'expo-sqlite';
 import CalendarItem from "../components/CalendarItem";
 import { colors } from "../components/colors";
 import closeIcon from "../assets/close.png"; 
 import addNew from "../assets/addNew.png"; 
+import search from "../assets/search.png"; 
 import { RouteProp, useRoute } from "@react-navigation/native";
 
 
@@ -53,6 +54,7 @@ paddingBottom: 25px;
 
 const ButtonView = styled.View`
 width: 100%; 
+marginBottom: 10px;
 flex-direction: row;
 justifyContent: space-between;
 align-items: center; 
@@ -74,6 +76,7 @@ const CalendarView = (props:NavProps) => {
     const [dataSet, setDataSet] = useState<any>([]); 
     const [showList, setShowList] = useState(false); 
     const [daysObject, setDaysObject] = useState({});
+    const [isLoading, setIsLoading] = useState(false); 
     const marked = daysObject;
 
     const getTasks = () =>{
@@ -100,21 +103,23 @@ const CalendarView = (props:NavProps) => {
               }
             )
         }); 
-
-        
+        setIsLoading(false);     
     }
     useEffect(() => {
+      setIsLoading(true); 
       getTasks(); 
     }, []); 
 
     useEffect(() => {
       if(updateData){
+      setIsLoading(true); 
       getTasks(); 
       setUpdateData(false);
       }
     }, [updateData]);
 
     useEffect(() => { 
+      setIsLoading(true); 
       getTasks(); 
     }, [route.params?.refresh]); 
 
@@ -137,7 +142,16 @@ const CalendarView = (props:NavProps) => {
     function addTask(){
       props.navigation.navigate('AddTask', {comeFrom: "CalendarView"})
     }
-
+    function searchTask(){
+      props.navigation.navigate('SearchPage', {comeFrom: "News"})
+    }
+    if(isLoading){
+      return(
+          <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+              <ActivityIndicator size={"large"} color="#5500dc"/>
+          </View>
+      );
+    }
     return(
         <SafeAreaView style={{flex: 1}}>
         <StatusBar style="light"></StatusBar>
@@ -146,14 +160,18 @@ const CalendarView = (props:NavProps) => {
             <TopSection source={topBackground} resizeMode="contain"></TopSection>
             <BottomSection>
             <ButtonView>
-                <View style={{width: 210, height:55, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
+                <View style={{width: 190, height:55, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
             <TouchableOpacity
-              style={{ margin: 5,borderColor: colors.textColor,width:195, height:40,
+              style={{ margin: 5,borderColor: colors.textColor,width:175, height:40,
                 borderWidth: 2, borderStyle: 'dotted', alignSelf:"center"}}
               onPress={()=>props.navigation.navigate('LandingPage', {refresh: refresh})}>
                 <ButtonText>NEWS FEED</ButtonText>
             </TouchableOpacity>
             </View>
+            <Pressable
+              onPress={()=>searchTask()}>
+              <Image source={search} style={{ width:65, height:65, alignSelf: "center"}}/>
+            </Pressable>
             <Pressable style={{width:65}}
               onPress={()=>addTask()}>
               <Image source={addNew} style={{ width:70, height:70}}/>

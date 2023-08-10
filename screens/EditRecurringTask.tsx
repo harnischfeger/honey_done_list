@@ -168,7 +168,7 @@ const EditRecurringTask: FunctionComponent<NavProps> = (_props) => {
   const [showStart, setShowStart] = useState(false); 
   const [showEnd, setShowEnd] = useState(false); 
 
-  const [error, setError] = useState('');
+  const [reqMessage, setReqMessage] = useState('');
   const initDate = new Date().toLocaleDateString("en-CA");
   //for recurring date rrule set
   const [daysOfWeek] = useState(weekDays);
@@ -200,10 +200,6 @@ const cancelChange = () =>{
 }
 
 const rruleDates = async(values: { every: string; startOn: string; endOn: string; isChecked: boolean}) => {
-  if(isSelectedDay.length === 0){
-
-
-  }
   const d = new Date();
   var time = d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();  
   var dateStart= new Date(values.startOn + " " + time);
@@ -213,7 +209,7 @@ const rruleDates = async(values: { every: string; startOn: string; endOn: string
   }
     const rule = new RRule({
       freq: RRule.WEEKLY,
-      byweekday: isSelectedDay, 
+      byweekday: isSelectedDay.length > 0 ? isSelectedDay: taskProps.days, 
       interval:  parseInt(values.every),
       dtstart: dateStart,
       until: dateEnd
@@ -241,9 +237,31 @@ const deleteSubmit=()=>{
   Alert.alert('Delete Tasks', 'Do you want to delete the entire series or just this task?', [
     {
       text: 'Entire Series',
-      onPress: () => deleteAllTasks()
+      onPress: () => confirmDeleteAll()
     },
-    {text: 'This Task', onPress: () => deleteSelectedTask()}
+    {text: 'This Task', onPress: () => confirmDelete()}
+  ]);
+
+}
+
+const confirmDelete=()=>{
+  Alert.alert('Confirm Delete', 'This will permanently delete this task. Do you wish to proceed?', [
+    {
+      text: 'No',
+      onPress: () => console.log('Cancel Pressed')
+    },
+    {text: 'Yes', onPress: () => deleteSelectedTask()}
+  ]);
+
+}
+
+const confirmDeleteAll=()=>{
+  Alert.alert('Confirm Delete', 'This will permanently delete this entire series. Do you wish to proceed?', [
+    {
+      text: 'No',
+      onPress: () => console.log('Cancel Pressed')
+    },
+    {text: 'Yes', onPress: () => deleteAllTasks()}
   ]);
 
 }
@@ -407,8 +425,10 @@ const insertLoop = async(values:any, recurringDates:any) => {
           validateOnBlur={false}
           onSubmit={async (values)  => {  
             if(isSelectedDay.length == 0){
-              alert("Please select day(s) of the week.");
+              setReqMessage("Required"); 
               return; 
+            }else{
+              setReqMessage("");
             }
             if (isSelectedDay.length > 0) {
               taskProps.days = isSelectedDay.toString();
@@ -456,6 +476,7 @@ const insertLoop = async(values:any, recurringDates:any) => {
       <StatusBar style="light"></StatusBar>
      <SafeAreaView style={{flex: 1, backgroundColor:"transparent"}}>
      <KeyboardAvoidingView behavior="padding">
+      <ScrollView>
   <EditContainer>
       <Pressable
       style={{zIndex: 99, alignSelf: "flex-start", position:'absolute'}}
@@ -567,6 +588,9 @@ const insertLoop = async(values:any, recurringDates:any) => {
     )
    })}
   </WeekContainer>
+  <View style={{alignContent: 'center'}}>
+  <Text style={{textAlign: 'center', color: 'red', display: "flex" }}>{reqMessage}</Text>
+  </View>
 <ToggleContainer>
 <LeftText style={{ width: 180, marginBottom: 20, marginRight: 20}}>Start On</LeftText>
 <Pressable onPress={toggleStart}>
@@ -640,6 +664,7 @@ const insertLoop = async(values:any, recurringDates:any) => {
   </Modal>
 </CalendarContainer>
 </EditContainer>
+</ScrollView>
 </KeyboardAvoidingView>
 </SafeAreaView>
 </BGContainer>

@@ -133,6 +133,11 @@ const NewsFeedItem = (props: ListProps) => {
             bgColor = colors.carBG; 
             imageSource = require("../assets/car.png");  
         }
+
+        if(props.type ==="Other"){
+            bgColor = colors.otherBG; 
+            imageSource = require("../assets/other.png");  
+        }
         return  bgColor; 
     }
 
@@ -153,22 +158,27 @@ const NewsFeedItem = (props: ListProps) => {
         var date = new Date(day + " " + time); 
         date.setDate(date.getDate() + 10); 
         var newDate = date.toLocaleDateString("en-CA");
-
-        db.transaction((tx: { executeSql: (arg0: string, arg1: any[], arg2: (tx: any, resultSet: any) => void, arg3: (tx: any, error: any) => boolean) => void; }) => {
-            tx.executeSql('Update tasks SET date = ? WHERE id = ?', [newDate, id],
-
-            (tx: any, resultSet: any)=> {
-                props.stateUpdate(); 
-            //alert("This task is szoozed for 10 days until: " + newDate); 
-            },
-      
-            (tx: any, error: string): boolean =>{
-              console.log("error" + error);     
-              return false; 
-          }
-          )
-          alert("Task has been snoozed for 10 days");
-        });
+        try{
+            db.transaction((tx: { executeSql: (arg0: string, arg1: any[], arg2: (tx: any, resultSet: any) => void, arg3: (tx: any, error: any) => boolean) => void; }) => {
+                tx.executeSql('Update tasks SET date = ? WHERE id = ?', [newDate, id],
+    
+                (tx: any, resultSet: any)=> {
+                    props.stateUpdate(); 
+                //alert("This task is szoozed for 10 days until: " + newDate); 
+                },
+          
+                (tx: any, error: string): boolean =>{
+                  console.log("error" + error);     
+                  return false; 
+              }
+              )
+              alert("Task has been snoozed for 10 days");
+            });
+        }
+        catch(error){
+            console.error("Error " + error); 
+        }
+   
 
     }
 
@@ -184,7 +194,7 @@ const NewsFeedItem = (props: ListProps) => {
     }
 
     const submitDone=(id: string)=> {
-        db.transaction((tx: { executeSql: (arg0: string, arg1: any[], arg2: (tx: any, resultSet: any) => void, arg3: (tx: any, error: any) => boolean) => void; }) => {
+        try{      db.transaction((tx: { executeSql: (arg0: string, arg1: any[], arg2: (tx: any, resultSet: any) => void, arg3: (tx: any, error: any) => boolean) => void; }) => {
             tx.executeSql('Update tasks SET iscompleted = ? WHERE id = ?', [1, id],
 
             (tx: any, resultSet: any)=> {
@@ -197,11 +207,14 @@ const NewsFeedItem = (props: ListProps) => {
               return false; 
           }
           )
-       
-        });
+        });}
+        catch(error){
+            console.error("Error " + error); 
+        }
+   
     }
 
-    function editClick(): void{
+    const editClick=() =>{
         props.stateUpdate();
         let taskProps = {
             "id": props.id,

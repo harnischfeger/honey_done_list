@@ -4,6 +4,7 @@ import EditTask from "../screens/EditTask";
 import AddTask from "../screens/AddTask";
 import CalendarView from "../screens/CalendarView"; 
 import EditRecurringTask from "../screens/EditRecurringTask"; 
+import SearchPage from "../screens/SearchPage";
 //nativation 
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -18,6 +19,7 @@ export type RootstackParamList = {
  AddTask: undefined; 
  CalendarView: undefined; 
  EditRecurringTask: undefined;
+ SearchPage: undefined; 
 
 }; 
 
@@ -40,6 +42,11 @@ const Rootstack: FunctionComponent = () => {
                   <Stack.Screen 
                 name="EditRecurringTask"
                 component={EditRecurringTask}
+                options={{headerShown: false}}
+                />
+                <Stack.Screen 
+                name="SearchPage"
+                component={SearchPage}
                 options={{headerShown: false}}
                 />
                   <Stack.Screen 

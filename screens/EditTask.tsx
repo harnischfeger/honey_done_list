@@ -1,7 +1,7 @@
 import React, {FunctionComponent, useEffect, useMemo, useState} from "react";
 import { StatusBar } from "expo-status-bar";
 import {colors} from "../components/colors"; 
-import {StyleSheet, View, Text, TextInput, Image, Pressable,KeyboardAvoidingView} from "react-native";
+import {StyleSheet, View, Text, TextInput, Image, Pressable,KeyboardAvoidingView, Alert} from "react-native";
 import styled from "styled-components/native";
 import {Formik, FormikProps} from "formik"; 
 import * as Yup from 'yup'; 
@@ -109,6 +109,17 @@ const EditTask: FunctionComponent<NavProps> = (_props) => {
         _props.navigation.navigate('LandingPage', {refresh: isRefresh}); 
       }
   }
+
+  const confirmDelete=()=>{
+    Alert.alert('Confirm Delete', 'This will permanently delete this task. Do you wish to proceed?', [
+      {
+        text: 'No',
+        onPress: () => console.log('Cancel Pressed')
+      },
+      {text: 'Yes', onPress: () => deleteSelectedTask()}
+    ]);
+  
+  }
   const deleteSelectedTask = () =>{
     try{
       db.transaction(tx => {
@@ -212,7 +223,7 @@ const EditTask: FunctionComponent<NavProps> = (_props) => {
       />
       </View>
       <Pressable
-      onPress={() => deleteSelectedTask()}> 
+      onPress={() => confirmDelete()}> 
         <Image source={deleteTask} style={{ width:60, height:60}}/>
       </Pressable>
       <Pressable

@@ -59,13 +59,6 @@ height: 90%;
 
 `; 
 
-const ButtonView = styled.View`
-width: 100%; 
-flex-direction: row;
-justifyContent: space-between;
-align-items: center; 
-`; 
-
 const AddContainer= styled.View`
 flexDirection: row;
 flexWrap: wrap;
@@ -186,7 +179,7 @@ const AddTask: FunctionComponent<NavProps> = (_props) => {
   const [showStart, setShowStart] = useState(false); 
   const [showEnd, setShowEnd] = useState(false); 
 
-  const [error, setError] = useState('');
+  const [reqMessage, setReqMessage] = useState('');
   const initDate = new Date().toLocaleDateString("en-CA");
   //for recurring date rrule set
   const [daysOfWeek, setDaysOfWeek] = useState(weekDays);
@@ -326,24 +319,6 @@ const markedEnd = useMemo(() => ({
   daysString:""
   };
 
-  
-const resetClick = () => {
-  values.id = ""; 
-  values.title = ""; 
-  values.type = ""; 
-  values.date = ""; 
-  values.every = ""; 
-  values.happens = ""; 
-  values.startOn = ""; 
-  values.endOn = ""; 
-  values.isChecked = false; 
-  values.isEnabled = false;
-  values.days = ""; 
-   setSelected(""); 
-   setSelectedStart(""); 
-   setSelectedEnd(""); 
-   setDaysOfWeek(weekDays); 
- }
    return (   
 
         <Formik 
@@ -355,8 +330,10 @@ const resetClick = () => {
           onSubmit={async (values, {resetForm})  => { 
             values.days = isSelectedDay.toString();
             if(values.days === "" && values.isEnabled == true){
-              alert("Please select day(s) of the week.");
+              setReqMessage("Required"); 
               return; 
+            }else{
+              setReqMessage("");
             }
             if (values.isEnabled == true){ 
               try{
@@ -383,7 +360,10 @@ const resetClick = () => {
                           setSelectedStart("");
                           setSelectedEnd("");  
                           setIsSelectedDay([]); 
-                          setDaysOfWeek(weekDays);                     
+                          for (let d = 0; d< daysOfWeek.length; d++){
+                            daysOfWeek[d].isSelected = false; 
+                          }
+                          setDaysOfWeek(daysOfWeek);                     
                       },
                       (tx, error): boolean =>{
                           console.log("Error " + error); 
@@ -436,7 +416,8 @@ const resetClick = () => {
   <BGContainer> 
     <SafeAreaView style={{flex: 1, backgroundColor:"transparent"}}>
       <StatusBar style="light"></StatusBar>
-      <KeyboardAvoidingView    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView>
   <AddContainer>
       <Pressable
       style={{zIndex: 99, alignSelf: "flex-start", position:'absolute'}}
@@ -452,7 +433,15 @@ const resetClick = () => {
 {/* <Button title="add" onPress={() => anotherSubmit()}/> */}
     {/* <Button title="drop" onPress={() => dropSubmit()}/> */}
     <Pressable
-      onPress={() => resetClick()}> 
+      onPress={() => {props.resetForm()
+        setSelected(""); 
+        setSelectedStart(""); 
+        setSelectedEnd(""); 
+        for (let d = 0; d< daysOfWeek.length; d++){
+          daysOfWeek[d].isSelected = false; 
+        }
+        setDaysOfWeek(daysOfWeek); 
+      }}> 
         <Image source={reset} style={{ width:60, height:60}}/>
       </Pressable>
     <Pressable
@@ -584,6 +573,9 @@ const resetClick = () => {
     )
    })}
   </WeekContainer>
+  <View style={{alignContent: 'center'}}>
+  <Text style={{textAlign: 'center', color: 'red', display: "flex" }}>{reqMessage}</Text>
+  </View>
 <ToggleContainer>
 <LeftText style={{ width: 180, marginBottom: 20, marginRight: 20}}>Start On</LeftText>
 <Pressable onPress={toggleStart}>
@@ -661,6 +653,7 @@ const resetClick = () => {
 </>    
 }
 </AddContainer>
+</ScrollView>
 </KeyboardAvoidingView>
 </SafeAreaView>
 </BGContainer>

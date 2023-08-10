@@ -2,5 +2,6 @@
     { "label": "Yardwork", "value": "Yardwork"},
     { "label": "Home", "value": "Home" },
     { "label": "Appliances", "value": "Appliances"},
-    { "label": "Car", "value": "Car"}
+    { "label": "Car", "value": "Car"},
+    { "label": "Other", "value": "Other"}
 ]

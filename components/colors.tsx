@@ -12,4 +12,5 @@ white:"#fff",
  activeColor: "#444b91",
  redBtn: "#c81d25",
  carBG: "#CA97DF",
+ otherBG:"#244ee3"
 }

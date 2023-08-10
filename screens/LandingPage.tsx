@@ -4,9 +4,10 @@ import styled from "styled-components/native";
 import { Container } from "../components/shared";
 import topBackground from "../assets/HDListlogo.png";  
 import NewsFeedItem from "../components/NewsFeedItem";
-import {Image, Pressable, TouchableOpacity, View, Text, SafeAreaView} from "react-native";
+import {Image, Pressable, TouchableOpacity, View, Text, SafeAreaView, ActivityIndicator} from "react-native";
 import * as SQLite from 'expo-sqlite';
 import addNew from "../assets/addNew.png"; 
+import search from "../assets/search.png"; 
 import { colors } from "../components/colors";
 import { RouteProp, useRoute } from "@react-navigation/native";
 
@@ -63,6 +64,8 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   const [dataSet, setDataSet] = useState(); 
   const [cameFrom] = useState("News")
   const [updateData, setUpdateData] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false); 
+  
   const getTasks = () =>{
     db.transaction(tx => {
       tx.executeSql(
@@ -85,20 +88,24 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
             }
           )
       }); 
+      setIsLoading(false); 
   }
 
   useEffect(() => {
+    setIsLoading(true); 
     getTasks(); 
   }, []); 
 
   useEffect(() => {
     if(updateData){
+    setIsLoading(true); 
     getTasks(); 
     setUpdateData(false);
     }
   }, [updateData]);
 
   useEffect(() => {
+    setIsLoading(true); 
     getTasks(); 
   }, [route.params?.refresh]); 
 
@@ -109,6 +116,17 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   function addTask(){
     _props.navigation.navigate('AddTask', {comeFrom: "News"})
   }
+  function searchTask(){
+    _props.navigation.navigate('SearchPage', {comeFrom: "News"})
+  }
+
+  if(isLoading){
+    return(
+        <View style={{flex:1, justifyContent:'center', alignItems:'center'}}>
+            <ActivityIndicator size={"large"} color="#5500dc"/>
+        </View>
+    );
+  }
     return(
 
       <SafeAreaView style={{flex: 1}}>
@@ -117,14 +135,18 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
             <TopSection source={topBackground} resizeMode="contain"></TopSection>
             <BottomSection>
               <ButtonView>
-                <View style={{width: 210, height:55, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
+                <View style={{width: 190, height:55, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
             <TouchableOpacity
-              style={{ margin: 5,borderColor: colors.textColor,width:195, height:40,
+              style={{ margin: 5,borderColor: colors.textColor,width:175, height:40,
                 borderWidth: 2, borderStyle: 'dotted', alignSelf:"center"}}
               onPress={()=>_props.navigation.navigate('CalendarView')}>
                 <ButtonText>CALENDAR</ButtonText>
             </TouchableOpacity>
             </View>
+            <Pressable
+              onPress={()=>searchTask()}>
+              <Image source={search} style={{ width:65, height:65, alignSelf: "center"}}/>
+            </Pressable>
             <Pressable
               onPress={()=>addTask()}>
               <Image source={addNew} style={{ width:70, height:70, alignSelf: "center"}}/>
