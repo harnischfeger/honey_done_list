@@ -9,7 +9,7 @@ import * as SQLite from 'expo-sqlite';
 import addNew from "../assets/addNew.png"; 
 import search from "../assets/search.png"; 
 import { colors } from "../components/colors";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import { DrawerActions, RouteProp, useRoute } from "@react-navigation/native";
 
 
 const db = SQLite.openDatabase("honeyDatabase.db");
@@ -65,7 +65,6 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   const [cameFrom] = useState("News")
   const [updateData, setUpdateData] = useState(false); 
   const [isLoading, setIsLoading] = useState(false); 
-  
   const getTasks = () =>{
     db.transaction(tx => {
       tx.executeSql(
