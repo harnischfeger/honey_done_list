@@ -230,20 +230,21 @@ const backArrowClick = () =>{
     _props.navigation.navigate('LandingPage', {refresh: isRefresh}); 
   }
 }
-const dropSubmit = () =>{
-    db.transaction(tx => {
-        tx.executeSql('DROP TABLE tasks; DELETE FROM SQLITE_SEQUENCE WHERE NAME = tasks',[],
+//for testing 
+// const dropSubmit = () =>{
+//     db.transaction(tx => {
+//         tx.executeSql('DROP TABLE tasks; DELETE FROM SQLITE_SEQUENCE WHERE NAME = tasks',[],
 
-        (tx, resultSet)=> {
-        },
+//         (tx, resultSet)=> {
+//         },
   
-        (tx, error): boolean =>{
-          console.log("error" + error); 
-          return false; 
-      }
-      )
-    });
-}
+//         (tx, error): boolean =>{
+//           console.log("error" + error); 
+//           return false; 
+//       }
+//       )
+//     });
+// }
 const toggleStart = () => {
 setShowStart(!showStart); 
 };
