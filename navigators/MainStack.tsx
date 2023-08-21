@@ -1,8 +1,6 @@
 import React, {FunctionComponent} from "react";
-import LandingPage from "./../screens/LandingPage"; 
 import EditTask from "../screens/EditTask";
 import AddTask from "../screens/AddTask";
-import CalendarView from "../screens/CalendarView"; 
 import EditRecurringTask from "../screens/EditRecurringTask"; 
 import SearchPage from "../screens/SearchPage";
 import DrawerStack from "../navigators/DrawerStack"; 
@@ -20,6 +18,10 @@ export type MainstackParamList = {
  SearchPage: undefined; 
  DrawerStack: undefined; 
  About:undefined;
+ HowTo: undefined; 
+ TermsConditions: undefined; 
+ Support: undefined; 
+ Recommend: undefined; 
 }; 
 
 const Stack = createStackNavigator<MainstackParamList>(); 

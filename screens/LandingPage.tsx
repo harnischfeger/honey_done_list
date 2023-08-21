@@ -27,11 +27,6 @@ interface NavProps{
     navigation : any;   
 }
 
-const TaskList = styled.FlatList`
-margin-top: 10px; 
-width: 100%;
-flex:1; 
-`;
 
 const LandingPageContainer = styled(Container)`
 justify-content: space-between;
@@ -40,7 +35,6 @@ height: 100%;
 `; 
 
 const TopSection = styled.ImageBackground`
-marginTop: 25px; 
 width: 100%; 
 flex:1; 
 `; 
@@ -65,6 +59,12 @@ font-family: GelasioReg;
 font-size: 20px;
 color: ${colors.textColor}; 
 textAlign: center; 
+`;
+
+const TaskList = styled.FlatList`
+margin-top: 10px; 
+width: 100%;
+flex:1; 
 `;
 
 const LandingPage: FunctionComponent<NavProps> = (_props) =>{
@@ -185,7 +185,7 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   }
     return(
 
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1, backgroundColor:"transparent"}}>
         <StatusBar style="light"></StatusBar>
         <LandingPageContainer>
           {/* <TouchableOpacity onPress={sendNoti}><Text style={{color:colors.white}}>Click Me for push notification</Text></TouchableOpacity> */}

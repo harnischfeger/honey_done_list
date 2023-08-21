@@ -29,13 +29,13 @@ interface MarkedProps{
 }
 
 const CalendarViewContainer = styled(Container)`
+justify-content: space-between;
 width:100%; 
-height: 100%; 
+flex:1; 
 `; 
 
 const TopSection = styled.ImageBackground`
 width: 100%; 
-height: 100%; 
 flex:1; 
 `; 
 
@@ -153,7 +153,7 @@ const CalendarView = (props:NavProps) => {
       );
     }
     return(
-        <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1, backgroundColor:"transparent"}}>
         <StatusBar style="light"></StatusBar>
 
         <CalendarViewContainer>
