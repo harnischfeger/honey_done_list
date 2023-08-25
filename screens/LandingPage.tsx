@@ -11,6 +11,7 @@ import search from "../assets/search.png";
 import { colors } from "../components/colors";
 import { DrawerActions, RouteProp, useRoute } from "@react-navigation/native";
 import * as Notifications from 'expo-notifications'; 
+import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 
 const db = SQLite.openDatabase("honeyDatabase.db");
@@ -67,6 +68,10 @@ width: 100%;
 flex:1; 
 `;
 
+const interstitial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
+  requestNonPersonalizedAdsOnly: true
+});
+
 const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   let route: RouteProp<{params: {refresh: boolean}}, 'params'> = useRoute();
   let refresh = route.params?.refresh; 
@@ -79,10 +84,32 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   const responseListener = useRef<Notifications.Subscription | undefined>();
   const todaysDate = new Date().toLocaleDateString("en-CA");
 
+  const [interstitialLoaded, setInterstitialLoaded] = useState(false); 
+
   const [dataSet, setDataSet] = useState(); 
   const [cameFrom] = useState("News")
   const [updateData, setUpdateData] = useState(false); 
   const [isLoading, setIsLoading] = useState(false); 
+
+  const loadinterstitial = ()=>{
+    const unsubscribeLoaded = interstitial.addAdEventListener(
+      AdEventType.LOADED, ()=>{
+        setInterstitialLoaded(true);
+      }
+    ); 
+    const unsubscribeClosed = interstitial.addAdEventListener(
+      AdEventType.CLOSED, ()=>{
+        setInterstitialLoaded(false);
+        interstitial.load(); 
+      }
+    ); 
+    interstitial.load(); 
+    return () => {
+      unsubscribeClosed();
+      unsubscribeLoaded(); 
+    }
+  }
+
   const getTasks = async () =>{
     await db.transaction(tx => {
       tx.executeSql(
@@ -114,7 +141,6 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   useEffect(() => {
     setIsLoading(true); 
     getTasks(); 
-
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       setNotification(notification);
     });
@@ -135,9 +161,12 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
         responseListener.current.remove();
       }
     };
-
-
   }, []); 
+
+  useEffect(()=>{
+    const unsubscribeInterstitialEvents = loadinterstitial();  
+    return unsubscribeInterstitialEvents; 
+  }, []);
 
   useEffect(() => {
     if(updateData){
@@ -157,6 +186,7 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   };
 
   function addTask(){
+    interstitial.show(); 
     _props.navigation.navigate('AddTask', {comeFrom: "News"})
   }
   function searchTask(){
@@ -187,6 +217,7 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
 
       <SafeAreaView style={{flex: 1, backgroundColor:"transparent"}}>
         <StatusBar style="light"></StatusBar>
+ 
         <LandingPageContainer>
           {/* <TouchableOpacity onPress={sendNoti}><Text style={{color:colors.white}}>Click Me for push notification</Text></TouchableOpacity> */}
             <TopSection source={topBackground} resizeMode="contain"></TopSection>

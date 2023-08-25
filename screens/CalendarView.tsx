@@ -12,8 +12,12 @@ import closeIcon from "../assets/close.png";
 import addNew from "../assets/addNew.png"; 
 import search from "../assets/search.png"; 
 import { RouteProp, useRoute } from "@react-navigation/native";
+import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
 
+const interstitial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
+  requestNonPersonalizedAdsOnly: true
+});
 
 const db = SQLite.openDatabase("honeyDatabase.db");
 
@@ -77,7 +81,27 @@ const CalendarView = (props:NavProps) => {
     const [showList, setShowList] = useState(false); 
     const [daysObject, setDaysObject] = useState({});
     const [isLoading, setIsLoading] = useState(false); 
+    const [interstitialLoaded, setInterstitialLoaded] = useState(false); 
     const marked = daysObject;
+
+    const loadinterstitial = ()=>{
+      const unsubscribeLoaded = interstitial.addAdEventListener(
+        AdEventType.LOADED, ()=>{
+          setInterstitialLoaded(true);
+        }
+      ); 
+      const unsubscribeClosed = interstitial.addAdEventListener(
+        AdEventType.CLOSED, ()=>{
+          setInterstitialLoaded(false);
+          interstitial.load(); 
+        }
+      ); 
+      interstitial.load(); 
+      return () => {
+        unsubscribeClosed();
+        unsubscribeLoaded(); 
+      }
+    }
 
     const getTasks = () =>{
         db.transaction(tx => {
@@ -105,6 +129,12 @@ const CalendarView = (props:NavProps) => {
         }); 
         setIsLoading(false);     
     }
+
+    useEffect(()=>{
+      const unsubscribeInterstitialEvents = loadinterstitial();  
+      return unsubscribeInterstitialEvents; 
+    }, []);
+
     useEffect(() => {
       setIsLoading(true); 
       getTasks(); 
@@ -140,6 +170,7 @@ const CalendarView = (props:NavProps) => {
     }
   
     function addTask(){
+      interstitial.show(); 
       props.navigation.navigate('AddTask', {comeFrom: "CalendarView"})
     }
     function searchTask(){

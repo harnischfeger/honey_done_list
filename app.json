@@ -21,10 +21,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/iconHDL.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.yvonneharn.honey_done_list"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "74a69f8c-14cc-46ac-8b1d-db4bcaec4648"
+      }
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-3100142748400399~7908127872"
   }
 }
