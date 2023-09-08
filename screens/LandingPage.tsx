@@ -15,6 +15,8 @@ import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from 're
 
 
 const db = SQLite.openDatabase("honeyDatabase.db");
+//const adUnitid = 'ca-app-pub-3100142748400399/2823585482';
+//const adUnitid = TestIds.INTERSTITIAL;
 
 Notifications.setNotificationHandler({
   handleNotification:async()=> ({
@@ -60,6 +62,7 @@ font-family: GelasioReg;
 font-size: 20px;
 color: ${colors.textColor}; 
 textAlign: center; 
+paddingTop:2px;
 `;
 
 const TaskList = styled.FlatList`
@@ -68,9 +71,9 @@ width: 100%;
 flex:1; 
 `;
 
-const interstitial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-  requestNonPersonalizedAdsOnly: true
-});
+// const interstitial = InterstitialAd.createForAdRequest(adUnitid, {
+//   requestNonPersonalizedAdsOnly: true
+// });
 
 const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   let route: RouteProp<{params: {refresh: boolean}}, 'params'> = useRoute();
@@ -84,31 +87,32 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   const responseListener = useRef<Notifications.Subscription | undefined>();
   const todaysDate = new Date().toLocaleDateString("en-CA");
 
-  const [interstitialLoaded, setInterstitialLoaded] = useState(false); 
+  //const [interstitialLoaded, setInterstitialLoaded] = useState(false); 
 
   const [dataSet, setDataSet] = useState(); 
   const [cameFrom] = useState("News")
   const [updateData, setUpdateData] = useState(false); 
   const [isLoading, setIsLoading] = useState(false); 
 
-  const loadinterstitial = ()=>{
-    const unsubscribeLoaded = interstitial.addAdEventListener(
-      AdEventType.LOADED, ()=>{
-        setInterstitialLoaded(true);
-      }
-    ); 
-    const unsubscribeClosed = interstitial.addAdEventListener(
-      AdEventType.CLOSED, ()=>{
-        setInterstitialLoaded(false);
-        interstitial.load(); 
-      }
-    ); 
-    interstitial.load(); 
-    return () => {
-      unsubscribeClosed();
-      unsubscribeLoaded(); 
-    }
-  }
+  // const loadinterstitial = ()=>{
+  //   const unsubscribeLoaded = interstitial.addAdEventListener(
+  //     AdEventType.LOADED, ()=>{
+  //       setInterstitialLoaded(true);
+  //     }
+  //   ); 
+  //   const unsubscribeClosed = interstitial.addAdEventListener(
+  //     AdEventType.CLOSED, ()=>{
+  //       setInterstitialLoaded(false);
+  //       interstitial.load(); 
+  //     }
+  //   ); 
+  //   console.log("Load");
+  //   interstitial.load(); 
+  //   return () => {
+  //     unsubscribeClosed();
+  //     unsubscribeLoaded(); 
+  //   }
+  // }
 
   const getTasks = async () =>{
     await db.transaction(tx => {
@@ -163,10 +167,10 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
     };
   }, []); 
 
-  useEffect(()=>{
-    const unsubscribeInterstitialEvents = loadinterstitial();  
-    return unsubscribeInterstitialEvents; 
-  }, []);
+  // useEffect(()=>{
+  //   const unsubscribeInterstitialEvents = loadinterstitial();  
+  //   return unsubscribeInterstitialEvents; 
+  // }, []);
 
   useEffect(() => {
     if(updateData){
@@ -186,7 +190,7 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
   };
 
   function addTask(){
-    interstitial.show(); 
+    //interstitial.show(); 
     _props.navigation.navigate('AddTask', {comeFrom: "News"})
   }
   function searchTask(){
@@ -223,9 +227,9 @@ const LandingPage: FunctionComponent<NavProps> = (_props) =>{
             <TopSection source={topBackground} resizeMode="contain"></TopSection>
             <BottomSection>
               <ButtonView>
-                <View style={{width: 190, height:55, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
+                <View style={{width: 190, height:63, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
             <TouchableOpacity
-              style={{ margin: 5,borderColor: colors.textColor,width:175, height:40,
+              style={{ margin: 5,borderColor: colors.textColor,width:175, height:48,
                 borderWidth: 2, borderStyle: 'dotted', alignSelf:"center"}}
               onPress={()=>_props.navigation.navigate('CalendarView')}>
                 <ButtonText>CALENDAR</ButtonText>

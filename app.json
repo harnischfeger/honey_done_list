@@ -18,11 +18,12 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.yvonneharn.honeydonelist",
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/iconHDL.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.yvonneharn.honey_done_list"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

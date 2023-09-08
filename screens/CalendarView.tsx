@@ -14,10 +14,11 @@ import search from "../assets/search.png";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { AdEventType, BannerAd, BannerAdSize, InterstitialAd, TestIds } from 'react-native-google-mobile-ads';
 
-
-const interstitial = InterstitialAd.createForAdRequest(TestIds.INTERSTITIAL, {
-  requestNonPersonalizedAdsOnly: true
-});
+//const adUnitid = 'ca-app-pub-3100142748400399/2823585482';
+// const adUnitid = TestIds.INTERSTITIAL;
+// const interstitial = InterstitialAd.createForAdRequest(adUnitid, {
+//   requestNonPersonalizedAdsOnly: true
+// });
 
 const db = SQLite.openDatabase("honeyDatabase.db");
 
@@ -69,6 +70,7 @@ font-family: GelasioReg;
 font-size: 20px;
 color: ${colors.textColor}; 
 textAlign: center; 
+paddingTop:2px;
 `;
 
 const CalendarView = (props:NavProps) => {
@@ -84,24 +86,24 @@ const CalendarView = (props:NavProps) => {
     const [interstitialLoaded, setInterstitialLoaded] = useState(false); 
     const marked = daysObject;
 
-    const loadinterstitial = ()=>{
-      const unsubscribeLoaded = interstitial.addAdEventListener(
-        AdEventType.LOADED, ()=>{
-          setInterstitialLoaded(true);
-        }
-      ); 
-      const unsubscribeClosed = interstitial.addAdEventListener(
-        AdEventType.CLOSED, ()=>{
-          setInterstitialLoaded(false);
-          interstitial.load(); 
-        }
-      ); 
-      interstitial.load(); 
-      return () => {
-        unsubscribeClosed();
-        unsubscribeLoaded(); 
-      }
-    }
+    // const loadinterstitial = ()=>{
+    //   const unsubscribeLoaded = interstitial.addAdEventListener(
+    //     AdEventType.LOADED, ()=>{
+    //       setInterstitialLoaded(true);
+    //     }
+    //   ); 
+    //   const unsubscribeClosed = interstitial.addAdEventListener(
+    //     AdEventType.CLOSED, ()=>{
+    //       setInterstitialLoaded(false);
+    //       interstitial.load(); 
+    //     }
+    //   ); 
+    //   interstitial.load(); 
+    //   return () => {
+    //     unsubscribeClosed();
+    //     unsubscribeLoaded(); 
+    //   }
+    // }
 
     const getTasks = () =>{
         db.transaction(tx => {
@@ -130,10 +132,10 @@ const CalendarView = (props:NavProps) => {
         setIsLoading(false);     
     }
 
-    useEffect(()=>{
-      const unsubscribeInterstitialEvents = loadinterstitial();  
-      return unsubscribeInterstitialEvents; 
-    }, []);
+    // useEffect(()=>{
+    //   const unsubscribeInterstitialEvents = loadinterstitial();  
+    //   return unsubscribeInterstitialEvents; 
+    // }, []);
 
     useEffect(() => {
       setIsLoading(true); 
@@ -150,7 +152,7 @@ const CalendarView = (props:NavProps) => {
 
     useEffect(() => { 
       setIsLoading(true); 
-      getTasks(); 
+      getTasks();  
     }, [route.params?.refresh]); 
 
     function changeState(){
@@ -170,7 +172,7 @@ const CalendarView = (props:NavProps) => {
     }
   
     function addTask(){
-      interstitial.show(); 
+      //interstitial.show(); 
       props.navigation.navigate('AddTask', {comeFrom: "CalendarView"})
     }
     function searchTask(){
@@ -191,9 +193,9 @@ const CalendarView = (props:NavProps) => {
             <TopSection source={topBackground} resizeMode="contain"></TopSection>
             <BottomSection>
             <ButtonView>
-                <View style={{width: 190, height:55, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
+                <View style={{width: 190, height:63, borderColor: colors.textColor, borderWidth: 2, borderRadius:2}}>
             <TouchableOpacity
-              style={{ margin: 5,borderColor: colors.textColor,width:175, height:40,
+              style={{ margin: 5,borderColor: colors.textColor,width:175, height:48,
                 borderWidth: 2, borderStyle: 'dotted', alignSelf:"center"}}
               onPress={()=>props.navigation.navigate('LandingPage', {refresh: refresh})}>
                 <ButtonText>NEWS FEED</ButtonText>
